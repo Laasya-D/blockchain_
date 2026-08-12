@@ -1,0 +1,2141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Blockchain Club</title>
+<meta name="description" content="A university student organization researching distributed systems, applied cryptography, and offensive & defensive security." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+<style>
+  .selected-event{
+  margin-top:16px;
+  padding:16px;
+  border-left:2px solid var(--accent);
+  background:var(--accent-dim);
+}
+
+.selected-event-title{
+  font-size:16px;
+  color:var(--text);
+}
+
+.selected-event-meta{
+  margin-top:7px;
+  color:var(--text-faint);
+  font-size:9px;
+  letter-spacing:.05em;
+}
+
+.selected-event-description{
+  margin-top:12px;
+  color:var(--text-dim);
+  font-size:13px;
+  line-height:1.6;
+}
+  .calendar-event-dot{
+  width:6px;
+  height:6px;
+  margin-top:10px;
+  background:var(--accent);
+  border-radius:50%;
+}
+/* tokens*/
+.calendar-details{
+  padding:26px 30px;
+  border-top:1px solid var(--border);
+  background:rgba(255,255,255,.01);
+}
+
+.calendar-details h3{
+  margin-top:10px;
+  font-size:18px;
+  font-weight:500;
+}
+
+.calendar-details p{
+  margin-top:8px;
+  color:var(--text-dim);
+  font-size:13px;
+  line-height:1.6;
+}
+
+.calendar-day{
+  cursor:pointer;
+}
+
+.calendar-day.selected{
+  background:var(--accent-dim);
+}
+
+.calendar-day.selected .calendar-number{
+  color:var(--text);
+}
+.calendar-events{
+  margin-top:10px;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.calendar-event{
+  padding:5px 7px;
+  border-left:2px solid var(--accent);
+  background:var(--accent-dim);
+  color:var(--text);
+  font-family:var(--font-mono);
+  font-size:9px;
+  line-height:1.4;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+:root{
+  --bg:#070707;
+  --bg-alt:#0c0c0c;
+  --bg-elevated:#111110;
+  --text:#f1ece1;
+  --text-dim:#8b8a85;
+  --text-faint:#4c4b47;
+  --border:#1d1d1c;
+  --border-light:#2b2b29;
+  --accent:#b5051c;
+  --accent-bright:#d02b44;
+  --accent-dim:#2c1216;
+  --font-display:'Space Grotesk',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --container:1240px;
+  --radius:2px;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:var(--font-body);font-weight:400;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:500;margin:0;letter-spacing:-0.01em;color:var(--text);}
+p{margin:0;}
+a{color:inherit;text-decoration:none;}
+ul{margin:0;padding:0;list-style:none;}
+button{font-family:inherit;cursor:pointer;}
+input,textarea,select{font-family:var(--font-body);}
+img{max-width:100%;display:block;}
+::selection{background:var(--accent);color:#fff;}
+:focus-visible{outline:1.5px solid var(--accent-bright);outline-offset:2px;}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important;animation-iteration-count:1 !important;transition-duration:0.001ms !important;scroll-behavior:auto !important;}
+}
+.container{max-width:var(--container);margin:0 auto;padding:0 32px;}
+.mono{font-family:var(--font-mono);}
+.text-dim{color:var(--text-dim);}
+.text-faint{color:var(--text-faint);}
+.accent{color:var(--accent-bright);}
+
+/*util*/
+.eyebrow{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--text-dim);display:inline-flex;align-items:center;gap:8px;
+}
+.eyebrow::before{content:'';width:5px;height:5px;background:var(--accent);display:inline-block;}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 26px;font-family:var(--font-mono);font-size:12px;letter-spacing:0.08em;text-transform:uppercase;
+  border:1px solid var(--border-light);border-radius:var(--radius);background:transparent;color:var(--text);
+  transition:border-color .25s ease, background .25s ease, transform .25s ease, color .25s ease;
+  white-space:nowrap;
+}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#f7ede9;}
+.btn-primary:hover{background:var(--accent-bright);border-color:var(--accent-bright);transform:translateY(-1px);}
+.btn-outline:hover{border-color:var(--text-dim);transform:translateY(-1px);}
+.btn-sm{padding:9px 16px;font-size:10.5px;}
+.link-btn{font-size:11px;letter-spacing:.08em;color:var(--text-dim);border:none;background:none;padding:4px 0;border-bottom:1px solid transparent;}
+.link-btn:hover{color:var(--text);border-color:var(--text-dim);}
+.link-btn.danger:hover{color:var(--accent-bright);border-color:var(--accent-bright);}
+.big-num{font-family:var(--font-display);font-weight:300;color:var(--text-faint);line-height:1;}
+.divider{border:none;border-top:1px solid var(--border);margin:0;}
+.badge{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;padding:4px 8px;border:1px solid var(--border-light);text-transform:uppercase;color:var(--text-dim);}
+.badge.published{color:#c9c4b8;border-color:#3a3a37;}
+.badge.draft{color:var(--text-faint);}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#7fae86;display:inline-block;box-shadow:0 0 6px #7fae8688;}
+.status-badge{display:flex;align-items:center;gap:8px;font-size:10.5px;letter-spacing:.1em;color:var(--text-dim);}
+
+/*sec*/
+.section{padding:100px 0;border-top:1px solid var(--border);}
+.section:first-of-type{border-top:none;}
+.section-head{display:flex;gap:28px;align-items:flex-start;margin-bottom:56px;}
+.section-head .big-num{font-size:56px;min-width:70px;}
+.section-head h2{font-size:clamp(26px,3.4vw,38px);text-transform:uppercase;letter-spacing:0.01em;}
+.section-head .section-copy{color:var(--text-dim);max-width:440px;margin-top:10px;font-size:15px;}
+.section-top-row{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;}
+
+/*navig*/
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;border-bottom:1px solid var(--border);
+  background:rgba(7,7,7,.78);backdrop-filter:blur(10px);}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:72px;}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.nav-logo img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  display: block;
+}
+
+.brand-name {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.nav-links{display:flex;gap:34px;}
+.nav-link{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);position:relative;padding:4px 0;transition:color .2s;}
+.nav-link::after{content:'';position:absolute;left:0;bottom:-3px;width:0;height:1px;background:var(--accent-bright);transition:width .25s ease;}
+.nav-link:hover,.nav-link.active{color:var(--text);}
+.nav-link:hover::after,.nav-link.active::after{width:100%;}
+.nav-toggle{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:8px;}
+.nav-toggle span{width:20px;height:1px;background:var(--text);display:block;}
+@media (max-width:900px){
+  .nav-links{position:fixed;top:72px;left:0;right:0;background:var(--bg);border-bottom:1px solid var(--border);
+    flex-direction:column;gap:0;max-height:0;overflow:hidden;transition:max-height .3s ease;}
+  .nav.nav-open .nav-links{max-height:520px;}
+  .nav-links .nav-link{padding:16px 32px;border-top:1px solid var(--border);width:100%;}
+  .nav-toggle{display:flex;}
+}
+
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:110px;overflow:hidden;}
+.network-canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.4;pointer-events:none;}
+.hero-inner{position:relative;z-index:2;}
+.hero-title{font-size:clamp(38px,7.2vw,84px);text-transform:uppercase;line-height:.98;letter-spacing:-0.01em;margin:22px 0 26px;}
+.hero-title span{display:block;}
+.hero-desc{max-width:520px;color:var(--text-dim);font-size:16px;margin-bottom:36px;}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;}
+.ascii-wrap{
+  position:relative;
+  margin-top:64px;
+  height:340px;
+}
+.ascii-canvas{position:absolute;inset:0;width:100%;height:100%;}
+@media (max-width:700px){.ascii-wrap{height:220px;}}
+
+/* section-scroll badge */
+.section-badge{position:fixed;left:24px;bottom:24px;z-index:150;display:flex;align-items:baseline;gap:10px;
+  font-family:var(--font-mono);border:1px solid var(--border-light);background:rgba(7,7,7,.7);backdrop-filter:blur(6px);
+  padding:10px 14px;opacity:.9;}
+.section-badge .num{font-size:20px;color:var(--accent-bright);}
+.section-badge .lbl{font-size:10px;letter-spacing:.14em;color:var(--text-dim);text-transform:uppercase;}
+.section-badge.fade{animation:badgeFade .4s ease;}
+@keyframes badgeFade{from{opacity:0;transform:translateY(4px);}to{opacity:.9;transform:translateY(0);}}
+@media (max-width:700px){.section-badge{display:none;}}
+
+/* ============================= ROWS (events/projects/courses) ============================= */
+.row-list{display:flex;flex-direction:column;}
+.row-item{display:grid;grid-template-columns:60px 1fr auto;gap:20px;align-items:center;padding:26px 4px;
+  border-top:1px solid var(--border);transition:padding-left .25s ease,border-color .25s ease;position:relative;}
+.row-list a.row-item{border-top:1px solid var(--border);}
+.row-item:last-child{border-bottom:1px solid var(--border);}
+.row-item:hover{padding-left:14px;border-color:var(--border-light);}
+.row-item:hover .row-arrow{transform:translateX(4px);opacity:1;}
+.row-index{font-family:var(--font-mono);color:var(--text-faint);font-size:13px;}
+.row-main .row-type{font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;color:var(--accent-bright);text-transform:uppercase;margin-bottom:6px;}
+.row-main h3{font-size:19px;font-weight:500;margin-bottom:4px;}
+.row-main .row-meta{font-family:var(--font-mono);font-size:11.5px;color:var(--text-dim);letter-spacing:.03em;}
+.row-arrow{font-family:var(--font-mono);color:var(--text-dim);opacity:.5;transition:all .25s ease;}
+@media (max-width:640px){.row-item{grid-template-columns:32px 1fr auto;}.row-main h3{font-size:16px;}}
+
+/* ============================= GRID CARDS (team/blogs/what-we-do) ============================= */
+.grid{display:grid;gap:1px;background:var(--border);border:1px solid var(--border);}
+.grid-3{grid-template-columns:repeat(3,1fr);}
+.grid-4{grid-template-columns:repeat(4,1fr);}
+.grid > *{background:var(--bg);padding:32px;}
+@media (max-width:900px){.grid-3,.grid-4{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:560px){.grid-3,.grid-4{grid-template-columns:1fr;}}
+
+.img-placeholder{position:relative;width:100%;aspect-ratio:16/10;overflow:hidden;
+  background:repeating-linear-gradient(135deg, var(--border) 0 1px, transparent 1px 13px), var(--bg-elevated);
+  border:1px solid var(--border);}
+.img-placeholder::after{content:'';position:absolute;top:10px;right:10px;width:6px;height:6px;background:var(--accent);}
+.img-placeholder.portrait{aspect-ratio:3/4;}
+.cover-img{width:100%;aspect-ratio:16/10;object-fit:cover;border:1px solid var(--border);}
+.cover-img.portrait{aspect-ratio:3/4;}
+
+.blog-card{border:1px solid var(--border);padding:0;display:flex;flex-direction:column;transition:border-color .25s ease;}
+.blog-card:hover{border-color:var(--border-light);}
+.blog-card .bc-body{padding:22px;flex:1;display:flex;flex-direction:column;gap:10px;}
+.blog-card .bc-meta{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:var(--accent-bright);text-transform:uppercase;}
+.blog-card h3{font-size:18px;}
+.blog-card p{color:var(--text-dim);font-size:13.5px;}
+.blog-card .bc-foot{font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);margin-top:auto;}
+
+.team-card{text-align:left;}
+.team-card h3{font-size:17px;margin-top:16px;}
+.team-card .role{font-family:var(--font-mono);font-size:11px;color:var(--accent-bright);letter-spacing:.06em;margin-top:4px;}
+.team-card .dept{font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:.1em;text-transform:uppercase;margin-top:8px;}
+.team-card p.bio{margin-top:12px;font-size:13px;color:var(--text-dim);}
+
+.wwd-item{padding:32px;}
+.wwd-item .wwd-num{font-family:var(--font-mono);color:var(--accent-bright);font-size:12px;margin-bottom:14px;}
+.wwd-item h3{font-size:19px;margin-bottom:10px;}
+.wwd-item p{color:var(--text-dim);font-size:14px;}
+
+/* ============================= EMPTY STATE ============================= */
+.empty-state{border:1px dashed var(--border-light);padding:70px 32px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;}
+.empty-state .eyebrow{margin-bottom:4px;}
+.empty-state h3{font-size:24px;text-transform:uppercase;}
+.empty-state p{color:var(--text-dim);max-width:420px;font-size:14px;}
+
+/* ============================= FORMS (public contact + admin) ============================= */
+.field{margin-bottom:22px;}
+.field label{display:block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;}
+.field input,.field textarea,.field select{
+  width:100%;background:var(--bg-elevated);border:1px solid var(--border-light);color:var(--text);
+  padding:13px 14px;font-size:14px;border-radius:var(--radius);transition:border-color .2s;
+}
+.field input::placeholder,.field textarea::placeholder{color:var(--text-faint);}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent-bright);outline:none;}
+.field textarea{resize:vertical;min-height:100px;font-family:var(--font-body);}
+.field textarea.mono-area{font-family:var(--font-mono);font-size:12.5px;}
+.field-hint{font-size:11px;color:var(--text-faint);margin-top:6px;}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media (max-width:640px){.form-row-2{grid-template-columns:1fr;}}
+
+/* ============================= PAGE HEADER (interior pages) ============================= */
+.page-head{padding:160px 0 70px;border-bottom:1px solid var(--border);}
+.page-head h1{font-size:clamp(32px,5.4vw,58px);text-transform:uppercase;margin-top:16px;}
+.page-head p{color:var(--text-dim);max-width:520px;margin-top:16px;font-size:15px;}
+
+/* ============================= FOOTER ============================= */
+.site-footer{border-top:1px solid var(--border);padding:80px 0 0;margin-top:0;}
+.footer-inner{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;padding-bottom:56px;}
+.footer-col a{display:block;color:var(--text-dim);font-size:13.5px;padding:6px 0;transition:color .2s;}
+.footer-col a:hover{color:var(--text);}
+.footer-heading{font-size:10.5px;letter-spacing:.12em;color:var(--text-faint);margin-bottom:14px;}
+.footer-col p{color:var(--text-dim);font-size:13.5px;max-width:320px;margin:14px 0 20px;}
+.footer-bottom{display:flex;justify-content:space-between;padding:22px 0;border-top:1px solid var(--border);font-size:10.5px;color:var(--text-faint);letter-spacing:.06em;}
+@media (max-width:700px){.footer-inner{grid-template-columns:1fr;}.footer-bottom{flex-direction:column;gap:6px;}}
+
+/* ============================= BLOG DETAIL / PROSE ============================= */
+.prose{max-width:720px;font-size:16px;line-height:1.8;color:#d8d3c8;}
+.prose h1,.prose h2,.prose h3{margin:36px 0 14px;text-transform:none;color:var(--text);}
+.prose p{margin-bottom:18px;color:#c8c3b8;}
+.prose ul,.prose ol{margin:0 0 18px 22px;color:#c8c3b8;}
+.prose li{margin-bottom:6px;}
+.prose a{color:var(--accent-bright);text-decoration:underline;text-underline-offset:3px;}
+.prose img{border:1px solid var(--border);margin:20px 0;}
+.prose code{font-family:var(--font-mono);background:var(--bg-elevated);padding:2px 6px;font-size:.9em;border:1px solid var(--border);}
+.prose pre{background:var(--bg-elevated);border:1px solid var(--border);padding:18px;overflow-x:auto;margin:20px 0;}
+.prose pre code{border:none;padding:0;}
+.prose blockquote{border-left:2px solid var(--accent);padding-left:18px;color:var(--text-dim);margin:20px 0;}
+
+.admin-shell{display:flex;min-height:100vh;padding-top:0;}
+.admin-sidebar{width:230px;flex-shrink:0;border-right:1px solid var(--border);background:var(--bg-alt);
+  position:sticky;top:0;height:100vh;padding:26px 0;display:flex;flex-direction:column;}
+.admin-brand{font-family:var(--font-mono);font-size:12.5px;letter-spacing:.1em;padding:0 24px 22px;border-bottom:1px solid var(--border);}
+.admin-brand small{display:block;color:var(--text-faint);font-size:9.5px;margin-top:4px;letter-spacing:.14em;}
+.admin-nav{padding:16px 0;flex:1;}
+.admin-nav a{display:block;padding:11px 24px;font-family:var(--font-mono);font-size:11.5px;letter-spacing:.06em;
+  color:var(--text-dim);border-left:2px solid transparent;text-transform:uppercase;}
+.admin-nav a:hover{color:var(--text);background:rgba(255,255,255,.02);}
+.admin-nav a.active{color:var(--text);border-left-color:var(--accent-bright);background:rgba(255,255,255,.02);}
+.admin-nav .divider{margin:14px 24px;}
+.admin-foot{padding:16px 24px;border-top:1px solid var(--border);}
+.admin-foot .user-email{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);margin-bottom:10px;word-break:break-all;}
+.admin-main{flex:1;padding:44px 48px;max-width:1100px;}
+.admin-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:34px;flex-wrap:wrap;gap:16px;}
+.admin-topbar h1{font-size:26px;text-transform:uppercase;}
+.admin-form{max-width:680px;}
+.form-actions{display:flex;gap:12px;align-items:center;margin-top:8px;flex-wrap:wrap;}
+.admin-table{width:100%;border-collapse:collapse;border:1px solid var(--border);}
+.admin-table th{text-align:left;font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-faint);padding:12px 16px;border-bottom:1px solid var(--border-light);background:var(--bg-alt);}
+.admin-table td{padding:14px 16px;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--text-dim);}
+.admin-table tr:hover td{background:rgba(255,255,255,.015);color:var(--text);}
+.admin-row-actions{display:flex;gap:14px;white-space:nowrap;}
+.stat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:44px;}
+.stat-card{background:var(--bg);padding:26px 22px;}
+.stat-card .stat-num{font-family:var(--font-display);font-size:38px;color:var(--text);font-weight:300;}
+.stat-card .stat-lbl{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:var(--text-dim);text-transform:uppercase;margin-top:8px;}
+.activity-list{border:1px solid var(--border);}
+.activity-row{display:flex;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);font-size:13.5px;}
+.activity-row:last-child{border-bottom:none;}
+.activity-row .act-time{font-family:var(--font-mono);font-size:11px;color:var(--text-faint);}
+@media (max-width:1000px){
+  .stat-grid{grid-template-columns:repeat(2,1fr);}
+  .admin-shell{flex-direction:column;}
+  .admin-sidebar{width:100%;height:auto;position:relative;flex-direction:row;align-items:center;overflow-x:auto;padding:14px 0;}
+  .admin-brand{border-bottom:none;border-right:1px solid var(--border);padding:0 18px;flex-shrink:0;}
+  .admin-nav{display:flex;padding:0;}
+  .admin-nav a{padding:10px 14px;border-left:none;border-bottom:2px solid transparent;white-space:nowrap;}
+  .admin-nav a.active{border-left:none;border-bottom-color:var(--accent-bright);}
+  .admin-nav .divider{display:none;}
+  .admin-foot{display:none;}
+  .admin-main{padding:28px 20px;}
+}
+
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;padding:24px;}
+.login-box{max-width:400px;width:100%;border:1px solid var(--border-light);background:var(--bg-alt);padding:44px 36px;position:relative;z-index:2;}
+.login-box h1{font-size:24px;text-transform:uppercase;margin:12px 0 30px;}
+.login-error{color:var(--accent-bright);font-size:12.5px;font-family:var(--font-mono);margin-bottom:16px;min-height:0;}
+.login-note{font-size:11.5px;color:var(--text-faint);margin-top:24px;line-height:1.6;border-top:1px solid var(--border);padding-top:18px;}
+
+#toast-root{position:fixed;bottom:24px;right:24px;z-index:500;display:flex;flex-direction:column;gap:10px;}
+.toast{background:var(--bg-elevated);border:1px solid var(--border-light);border-left:2px solid var(--accent-bright);
+  padding:14px 18px;font-family:var(--font-mono);font-size:12px;color:var(--text);animation:toastIn .3s ease;max-width:300px;}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+.page-fade{animation:pageIn .45s ease both;}
+@keyframes pageIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.page-loading{padding:200px 0;text-align:center;color:var(--text-faint);font-size:11px;letter-spacing:.2em;}
+.not-found{padding:220px 0;text-align:center;}
+.not-found h1{font-size:80px;color:var(--text-faint);}
+
+@keyframes riseIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.hero-title span{animation:riseIn .7s ease both;}
+.hero-title span:nth-child(2){animation-delay:.08s;}
+.hero-desc,.hero-cta{animation:riseIn .7s ease both;animation-delay:.18s;}
+.eyebrow{animation:riseIn .6s ease both;}
+/* ============================= CALENDAR ============================= */
+
+.calendar-section{
+  padding-top:80px;
+}
+
+.calendar{
+  max-width:900px;
+  margin:0 auto;
+  border:1px solid var(--border);
+  background:var(--bg-alt);
+}
+
+.calendar-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:26px 30px;
+  border-bottom:1px solid var(--border);
+}
+
+.calendar-header > div{
+  text-align:center;
+}
+
+.calendar-month{
+  font-family:var(--font-display);
+  font-size:24px;
+  font-weight:500;
+  text-transform:uppercase;
+  letter-spacing:.02em;
+}
+
+.calendar-year{
+  margin-top:4px;
+  color:var(--text-faint);
+  font-size:10px;
+  letter-spacing:.14em;
+}
+
+.calendar-nav{
+  width:40px;
+  height:40px;
+  border:1px solid var(--border-light);
+  background:transparent;
+  color:var(--text-dim);
+  font-size:16px;
+  transition:
+    border-color .2s ease,
+    color .2s ease,
+    background .2s ease;
+}
+
+.calendar-nav:hover{
+  color:var(--text);
+  border-color:var(--accent);
+  background:var(--accent-dim);
+}
+
+.calendar-weekdays,
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+}
+
+.calendar-weekdays{
+  border-bottom:1px solid var(--border);
+}
+
+.calendar-weekdays div{
+  padding:14px 10px;
+  text-align:center;
+  color:var(--text-faint);
+  font-size:9px;
+  letter-spacing:.1em;
+}
+
+.calendar-day{
+  min-height:100px;
+  padding:12px;
+  border-right:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  color:var(--text-dim);
+  position:relative;
+  transition:
+    background .2s ease,
+    color .2s ease;
+}
+
+.calendar-day:nth-child(7n){
+  border-right:none;
+}
+
+.calendar-day:hover{
+  background:rgba(255,255,255,.018);
+  color:var(--text);
+}
+
+.calendar-day.empty{
+  background:rgba(255,255,255,.008);
+}
+
+.calendar-number{
+  font-family:var(--font-mono);
+  font-size:11px;
+}
+
+.calendar-day.today .calendar-number{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:28px;
+  height:28px;
+  background:var(--accent);
+  color:#fff;
+}
+
+.calendar-empty{
+  max-width:900px;
+  margin:48px auto 0;
+  padding:30px 0;
+  border-top:1px solid var(--border);
+}
+
+.calendar-empty h3{
+  margin-top:12px;
+  font-size:20px;
+}
+
+.calendar-empty p{
+  margin-top:8px;
+  color:var(--text-dim);
+  font-size:14px;
+}
+
+@media(max-width:700px){
+
+  .calendar-header{
+    padding:20px;
+  }
+
+  .calendar-month{
+    font-size:20px;
+  }
+
+  .calendar-day{
+    min-height:70px;
+    padding:8px;
+  }
+
+  .calendar-weekdays div{
+    padding:10px 4px;
+    font-size:8px;
+  }
+
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast-root"></div>
+
+<script>
+
+
+const store = {
+  async get(key, shared = true){
+    try{
+      const r = await window.storage.get(key, shared);
+      return r ? JSON.parse(r.value) : null;
+    }catch(e){ return null; }
+  },
+  async set(key, value, shared = true){
+    try{ await window.storage.set(key, JSON.stringify(value), shared); return true; }
+    catch(e){ console.error('storage.set failed', e); return false; }
+  },
+  async remove(key, shared = true){
+    try{ await window.storage.delete(key, shared); return true; }
+    catch(e){ return false; }
+  }
+};
+
+function uid(){ return 'id_' + Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function esc(str){
+  return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function fmtDate(ts){
+  if(!ts) return '—';
+  const d = typeof ts === 'number' ? new Date(ts) : new Date(ts);
+  if(isNaN(d.getTime())) return esc(ts);
+  return d.toLocaleDateString('en-US',{ day:'2-digit', month:'short', year:'numeric' }).toUpperCase();
+}
+function showToast(msg){
+  const root = document.getElementById('toast-root');
+  const el = document.createElement('div');
+  el.className = 'toast mono';
+  el.textContent = msg;
+  root.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, 2600);
+}
+
+const SEED_EVENTS = [];
+const CLUB_EVENTS = [];
+const SEED_PROJECTS = [
+  { id: uid(), title:'Campus Credential Ledger', description:'A permissioned ledger prototype for issuing and verifying tamper-evident academic credentials across departments.',
+    status:'active', year:'2026', teamMembers:'Ariana Kwan, Devon Marsh', links:'GitHub|https://github.com', image:'' , visibility:'published'},
+  { id: uid(), title:'Threat Intel Aggregator', description:'A pipeline that collects, normalizes, and scores open-source threat intelligence feeds for club research use.',
+    status:'active', year:'2026', teamMembers:'Priya Nandakumar', links:'', image:'', visibility:'published' },
+  { id: uid(), title:'Zero-Knowledge Attendance', description:'An experimental zero-knowledge proof system for verifying event attendance without exposing member identities.',
+    status:'planning', year:'2026', teamMembers:'Devon Marsh, Sam Okafor', links:'', image:'', visibility:'published' },
+  { id: uid(), title:'CTF Infrastructure Toolkit', description:'Reusable infrastructure-as-code for standing up capture-the-flag challenge environments quickly.',
+    status:'completed', year:'2025', teamMembers:'Priya Nandakumar, Ariana Kwan', links:'', image:'', visibility:'draft' },
+];
+const SEED_COURSES = [
+  { id: uid(), title:'Applied Cryptography Fundamentals', level:'Beginner', duration:'6 weeks', instructor:'Dr. Elena Vasquez',
+    description:'Core concepts in symmetric and asymmetric cryptography, hashing, and digital signatures, with practical exercises.',
+    registrationLink:'', status:'published' },
+  { id: uid(), title:'Smart Contract Development', level:'Intermediate', duration:'8 weeks', instructor:'Sam Okafor',
+    description:'Design, write, and test smart contracts, covering common patterns and known vulnerability classes.',
+    registrationLink:'', status:'published' },
+  { id: uid(), title:'Offensive Security Bootcamp', level:'Advanced', duration:'10 weeks', instructor:'Priya Nandakumar',
+    description:'A lab-driven course covering penetration testing methodology, exploitation, and reporting.',
+    registrationLink:'', status:'published' },
+];
+const SEED_TEAM = [
+  { id: uid(), name:'Ariana Kwan', role:'President', department:'Leadership', bio:'Final-year Computer Science student focused on distributed systems and protocol design.', email:'ariana@bcc-club.edu', image:'', linkedin:'', github:'', order:'1' },
+  { id: uid(), name:'Devon Marsh', role:'VP of Blockchain', department:'Blockchain', bio:'Researches consensus mechanisms and maintains the club\'s smart contract projects.', email:'devon@bcc-club.edu', image:'', linkedin:'', github:'', order:'2' },
+  { id: uid(), name:'Priya Nandakumar', role:'VP of Cybersecurity', department:'Cybersecurity', bio:'Runs the club\'s CTF program and leads offensive security workshops.', email:'priya@bcc-club.edu', image:'', linkedin:'', github:'', order:'3' },
+  { id: uid(), name:'Sam Okafor', role:'Technical Lead', department:'Blockchain', bio:'Builds and audits the club\'s smart contract and tooling projects.', email:'sam@bcc-club.edu', image:'', linkedin:'', github:'', order:'4' },
+  { id: uid(), name:'Elena Vasquez', role:'Faculty Advisor', department:'Leadership', bio:'Assistant professor advising the club on curriculum and applied research.', email:'evasquez@university.edu', image:'', linkedin:'', github:'', order:'5' },
+];
+const DEFAULT_HOMEPAGE = {
+  heroEyebrow: 'A UNIVERSITY STUDENT ORGANIZATION',
+  heroTitle: 'BLOCKCHAIN CLUB',
+  heroDescription: 'A student-run collective researching distributed systems, applied cryptography, and offensive & defensive security — through workshops, projects, and open research.',
+  ctaPrimary: 'Learn More', ctaPrimaryLink: '#/about',
+  ctaSecondary: 'Upcoming Events', ctaSecondaryLink: '#/events',
+  wwd1Title:'Research', wwd1Desc:'We study protocol design, cryptographic primitives, and emerging attack surfaces.',
+  wwd2Title:'Build', wwd2Desc:'Members ship real tooling and smart contract projects across the semester.',
+  wwd3Title:'Defend', wwd3Desc:'We run CTFs, audits, and workshops to sharpen offensive and defensive practice.'
+};
+const DEFAULT_ABOUT = {
+  mission: 'To build a rigorous, hands-on community where students study distributed systems and security as one connected discipline.',
+  vision: 'A campus where every student graduating in computing has practical fluency in both decentralized systems and applied security.',
+  description: 'The Blockchain Club is a student-run organization for undergraduates and graduate students studying distributed systems, applied cryptography, and offensive and defensive security. We host weekly workshops, run a capture-the-flag program, and maintain a portfolio of open research and tooling projects. Membership is open to all majors — no prior experience required, only curiosity and a willingness to build.',
+  foundedYear: '2021'
+};
+const DEFAULT_CONTACT = {
+  email: 'contact@bcc-club.edu',
+  location: 'Engineering Building, Room 214, University Campus',
+  twitter: '', github: '', linkedin: '', discord: ''
+};
+
+async function ensureSeed(){
+  // const checks = [
+  //   ['bcc:events', SEED_EVENTS], ['bcc:projects', SEED_PROJECTS], ['bcc:courses', SEED_COURSES],
+  //   ['bcc:team', SEED_TEAM], ['bcc:blogs', []],
+  //   ['bcc:content:homepage', DEFAULT_HOMEPAGE], ['bcc:content:about', DEFAULT_ABOUT], ['bcc:content:contact', DEFAULT_CONTACT]
+  // ];
+  // for(const [key, val] of checks){
+  //   const existing = await store.get(key);
+  //   if(existing === null) await store.set(key, val);
+  // }
+}
+
+
+function makeCollectionService(key){
+  return {
+    async getAll(){ return (await store.get(key)) || []; },
+    async getPublished(){ return (await this.getAll()).filter(i => i.status === 'published'); },
+    async getById(id){ return (await this.getAll()).find(i => i.id === id) || null; },
+    async create(data){
+      const list = await this.getAll();
+      const item = { ...data, id: uid(), status: data.status || 'draft', createdAt: Date.now(), updatedAt: Date.now() };
+      list.unshift(item);
+      await store.set(key, list);
+      return item;
+    },
+    async update(id, patch){
+      const list = await this.getAll();
+      const idx = list.findIndex(i => i.id === id);
+      if(idx === -1) return null;
+      list[idx] = { ...list[idx], ...patch, updatedAt: Date.now() };
+      await store.set(key, list);
+      return list[idx];
+    },
+    async delete(id){
+      const list = (await this.getAll()).filter(i => i.id !== id);
+      await store.set(key, list);
+      return true;
+    }
+  };
+}
+function makeSingletonService(key, defaults){
+  return {
+    async get(){ const v = await store.get(key); return v || defaults; },
+    async update(patch){
+      const current = await this.get();
+      const merged = { ...current, ...patch };
+      await store.set(key, merged);
+      return merged;
+    }
+  };
+}
+const blogService = makeCollectionService('bcc:blogs');
+const eventService = makeCollectionService('bcc:events');
+const projectService = makeCollectionService('bcc:projects');
+const courseService = makeCollectionService('bcc:courses');
+const teamService = makeCollectionService('bcc:team');
+const homepageService = makeSingletonService('bcc:content:homepage', DEFAULT_HOMEPAGE);
+const aboutService = makeSingletonService('bcc:content:about', DEFAULT_ABOUT);
+const contactService = makeSingletonService('bcc:content:contact', DEFAULT_CONTACT);
+
+
+const authService = {
+  async login(email, password){
+    if(!email || !password) return { ok:false, error:'Email and password are required.' };
+    if(password.length < 4) return { ok:false, error:'Incorrect email or password.' };
+    await store.set('bcc:session', { email, loggedInAt: Date.now() }, false);
+    return { ok:true };
+  },
+  async logout(){ await store.remove('bcc:session', false); },
+  async isAuthenticated(){ return !!(await store.get('bcc:session', false)); },
+  async currentUser(){ return await store.get('bcc:session', false); }
+};
+const resourceConfigs = {
+  blogs: {
+    label:'Blogs', singular:'Blog Post', service: blogService,
+    listColumns:[['title','Title'],['author','Author'],['category','Category'],['status','Status'],['updatedAt','Updated']],
+    fields:[
+      {key:'title', label:'Title', type:'text', required:true},
+      {key:'author', label:'Author', type:'text', required:true},
+      {key:'category', label:'Category', type:'text', placeholder:'e.g. Research, Security, Events'},
+      {key:'coverImage', label:'Cover Image URL', type:'text', placeholder:'https://…'},
+      {key:'excerpt', label:'Short Description', type:'textarea'},
+      {key:'content', label:'Article Content', type:'markdown', hint:'Markdown supported — headings, lists, links, images, and ```code blocks```.'},
+    ]
+  },
+  events: {
+    label:'Events', singular:'Event', service: eventService,
+    listColumns:[['title','Title'],['type','Type'],['date','Date'],['status','Status']],
+    fields:[
+      {key:'title', label:'Title', type:'text', required:true},
+      {key:'type', label:'Event Type', type:'select', options:['Workshop','Hackathon','Talk','Meetup','CTF']},
+      {key:'date', label:'Date', type:'date'},
+      {key:'time', label:'Time', type:'text', placeholder:'18:00'},
+      {key:'location', label:'Location', type:'text'},
+      {key:'description', label:'Description', type:'textarea'},
+      {key:'registrationLink', label:'Registration Link', type:'text', placeholder:'https://…'},
+      {key:'image', label:'Image URL', type:'text', placeholder:'https://…'},
+    ]
+  },
+  projects: {
+    label:'Projects', singular:'Project', service: projectService,
+    listColumns:[['title','Title'],['status','Phase'],['year','Year'],['visibility','Status']],
+    fields:[
+      {key:'title', label:'Title', type:'text', required:true},
+      {key:'description', label:'Description', type:'textarea'},
+      {key:'status', label:'Phase', type:'select', options:['planning','active','completed']},
+      {key:'year', label:'Year', type:'text'},
+      {key:'teamMembers', label:'Team Members', type:'text', placeholder:'Comma separated names'},
+      {key:'links', label:'External Links', type:'text', placeholder:'Label|https://url, Label2|https://url2'},
+      {key:'image', label:'Image URL', type:'text', placeholder:'https://…'},
+    ],
+    statusField:'visibility'
+  },
+  courses: {
+    label:'Courses', singular:'Course', service: courseService,
+    listColumns:[['title','Title'],['level','Level'],['duration','Duration'],['status','Status']],
+    fields:[
+      {key:'title', label:'Title', type:'text', required:true},
+      {key:'level', label:'Level', type:'select', options:['Beginner','Intermediate','Advanced']},
+      {key:'duration', label:'Duration', type:'text', placeholder:'e.g. 6 weeks'},
+      {key:'instructor', label:'Instructor', type:'text'},
+      {key:'description', label:'Description', type:'textarea'},
+      {key:'registrationLink', label:'Registration Link', type:'text', placeholder:'https://…'},
+    ]
+  },
+  team: {
+    label:'Team', singular:'Team Member', service: teamService,
+    listColumns:[['name','Name'],['role','Role'],['department','Department'],['order','Order']],
+    fields:[
+      {key:'name', label:'Full Name', type:'text', required:true},
+      {key:'role', label:'Role', type:'text', required:true},
+      {key:'department', label:'Department', type:'select', options:['Leadership','Blockchain','Cybersecurity','Design','Operations']},
+      {key:'bio', label:'Bio', type:'textarea'},
+      {key:'email', label:'Email', type:'text'},
+      {key:'image', label:'Profile Image URL', type:'text', placeholder:'https://…'},
+      {key:'linkedin', label:'LinkedIn URL', type:'text'},
+      {key:'github', label:'GitHub URL', type:'text'},
+      {key:'order', label:'Display Order', type:'text', placeholder:'1'},
+    ],
+    noStatus:true
+  }
+};
+
+function compilePattern(pattern){
+  const paramNames = [];
+  const regexStr = '^' + pattern.replace(/:[^/]+/g, m => { paramNames.push(m.slice(1)); return '([^/]+)'; }) + '$';
+  return { regex: new RegExp(regexStr), paramNames };
+}
+const routes = [
+  { path:'/', view: HomePage },
+  { path:'/about', view: AboutPage },
+  { path:'/blogs', view: BlogsPage },
+  { path:'/blogs/:id', view: BlogDetailPage },
+  { path:'/events', view: EventsPage },
+  { path:'/projects', view: ProjectsPage },
+  { path:'/courses', view: CoursesPage },
+  { path:'/team', view: TeamPage },
+  { path:'/contact', view: ContactPage },
+  { path:'/admin/login', view: AdminLoginPage, after: bindLoginForm, admin:true, skipGuard:true },
+  { path:'/admin/dashboard', view: AdminDashboardPage, admin:true, key:'dashboard' },
+  { path:'/admin/homepage', view: AdminHomepagePage, after: bindHomepageForm, admin:true, key:'homepage' },
+  { path:'/admin/about', view: AdminAboutPage, after: bindAboutForm, admin:true, key:'about' },
+  { path:'/admin/contact', view: AdminContactPage, after: bindContactForm, admin:true, key:'contact' },
+  ...Object.keys(resourceConfigs).flatMap(rk => ([
+    { path:`/admin/${rk}`, view: () => AdminResourceListPage(rk), admin:true, key:rk },
+    { path:`/admin/${rk}/new`, view: () => AdminResourceEditorPage(rk, null), after: () => bindResourceEditor(rk, null), admin:true, key:rk },
+    { path:`/admin/${rk}/edit/:id`, view: p => AdminResourceEditorPage(rk, p.id), after: p => bindResourceEditor(rk, p.id), admin:true, key:rk },
+  ]))
+];
+routes.forEach(r => Object.assign(r, compilePattern(r.path)));
+
+function parseHash(){
+  let h = location.hash.slice(1);
+  if(!h) h = '/';
+  if(h.length > 1 && h.endsWith('/')) h = h.slice(0, -1);
+  return h;
+}
+function matchRoute(path){
+  for(const route of routes){
+    const m = path.match(route.regex);
+    if(m){
+      const params = {};
+      route.paramNames.forEach((name,i) => params[name] = decodeURIComponent(m[i+1]));
+      return { route, params };
+    }
+  }
+  return null;
+}
+let calendarDate = new Date();
+
+function initCalendar(){
+
+  const monthEl = document.getElementById('calendar-month');
+  const yearEl = document.getElementById('calendar-year');
+  const gridEl = document.getElementById('calendar-grid');
+  const selectedDateEl =
+  document.getElementById('selected-date');
+
+const selectedMessageEl =
+  document.getElementById('selected-date-message');
+  const prevBtn = document.getElementById('calendar-prev');
+  const nextBtn = document.getElementById('calendar-next');
+
+  if(!monthEl || !yearEl || !gridEl) return;
+
+  function renderCalendar(){
+
+    const year = calendarDate.getFullYear();
+    const month = calendarDate.getMonth();
+
+    const monthName = calendarDate.toLocaleString('en-US', {
+      month:'long'
+    });
+
+    monthEl.textContent = monthName;
+    yearEl.textContent = year;
+
+    gridEl.innerHTML = '';
+
+    const firstDay = new Date(year, month, 1);
+
+    // Convert Sunday=0 into Monday=0
+    const startingDay = (firstDay.getDay() + 6) % 7;
+
+    const daysInMonth = new Date(
+      year,
+      month + 1,
+      0
+    ).getDate();
+
+    // Empty cells before the first day
+    for(let i = 0; i < startingDay; i++){
+
+      const empty = document.createElement('div');
+
+      empty.className = 'calendar-day empty';
+
+      gridEl.appendChild(empty);
+    }
+
+    // Actual days
+    const today = new Date();
+
+    for(let day = 1; day <= daysInMonth; day++){
+
+      const cell = document.createElement('div');
+
+      cell.className = 'calendar-day';
+      cell.addEventListener('click', () => {
+
+  document
+    .querySelectorAll('.calendar-day.selected')
+    .forEach(dayCell => {
+      dayCell.classList.remove('selected');
+    });
+
+  cell.classList.add('selected');
+
+  const selectedDate =
+    new Date(year, month, day);
+
+  const formattedDate =
+    selectedDate.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    });
+
+  selectedDateEl.textContent =
+    formattedDate;
+
+  const selectedEvents =
+  CLUB_EVENTS.filter(
+    event => event.date ===
+      `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+  );
+
+if(selectedEvents.length === 0){
+
+  selectedMessageEl.textContent =
+    'No events scheduled for this date.';
+
+}else{
+
+  selectedMessageEl.innerHTML =
+    selectedEvents.map(event => `
+      <div class="selected-event">
+
+        <div class="selected-event-title">
+          ${event.title}
+        </div>
+
+        <div class="selected-event-meta mono">
+          ${event.time || ''}
+          ${event.venue ? ` · ${event.venue}` : ''}
+        </div>
+
+        ${
+          event.description
+            ? `<div class="selected-event-description">
+                ${event.description}
+              </div>`
+            : ''
+        }
+
+      </div>
+    `).join('');
+}
+});
+      const isToday =
+        day === today.getDate() &&
+        month === today.getMonth() &&
+        year === today.getFullYear();
+
+      if(isToday){
+        cell.classList.add('today');
+      }
+
+      const dateKey =
+  `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+const dayEvents = CLUB_EVENTS.filter(
+  event => event.date === dateKey
+);
+cell.innerHTML = `
+  <div class="calendar-number">
+    ${day}
+  </div>
+
+  ${
+    dayEvents.length
+      ? `<div class="calendar-event-dot"></div>`
+      : ''
+  }
+
+
+  <div class="calendar-events">
+    ${dayEvents.map(event => `
+      <div class="calendar-event">
+        ${event.title}
+      </div>
+    `).join('')}
+  </div>
+`;
+
+      gridEl.appendChild(cell);
+    }
+  }
+
+  prevBtn.addEventListener('click', () => {
+
+    calendarDate.setMonth(
+      calendarDate.getMonth() - 1
+    );
+
+    renderCalendar();
+
+  });
+
+  nextBtn.addEventListener('click', () => {
+
+    calendarDate.setMonth(
+      calendarDate.getMonth() + 1
+    );
+
+    renderCalendar();
+
+  });
+
+  renderCalendar();
+}
+async function render(){
+  const path = parseHash();
+  const found = matchRoute(path);
+  const app = document.getElementById('app');
+  if(!found){ app.innerHTML = `<div class="page-fade">${NotFoundPage()}</div>`; return; }
+  const { route, params } = found;
+  if(route.admin && !route.skipGuard){
+    const authed = await authService.isAuthenticated();
+    if(!authed){ location.hash = '#/admin/login'; return; }
+  }
+  app.innerHTML = '<div class="page-loading mono">LOADING…</div>';
+  let html;
+  try{ html = await route.view(params); }
+  catch(e){ console.error(e); html = NotFoundPage(); }
+  app.innerHTML = `<div class="page-fade">${html}</div>`;
+  window.scrollTo(0,0);
+  if(route.after) route.after(params);
+  initGlobalWidgets(path);
+  if(path === '/events'){
+  initCalendar();
+}
+}
+window.addEventListener('hashchange', render);
+window.addEventListener('DOMContentLoaded', async () => { await ensureSeed(); await render(); });
+
+/* ============================= SHARED COMPONENTS ============================= */
+function NavBar(active){
+  const links = [
+  ['#/about','About'],
+  ['#/events','Events'],
+  ['#/projects','Projects'],
+  ['#/team','Team'],
+  ['#/contact','Contact']
+];
+
+  return `
+    <header class="nav" id="site-nav">
+      <div class="container nav-inner">
+
+        <a href="#/" class="nav-logo" aria-label="Blockchain Club home">
+          <img src="logo.jpeg" alt="Blockchain Club logo">
+          <span class="brand-name">Blockchain Club</span>
+        </a>
+
+        <nav class="nav-links">
+          ${links.map(([href,label]) =>
+            `<a href="${href}" class="nav-link mono ${active===href?'active':''}">
+              ${label}
+            </a>`
+          ).join('')}
+        </nav>
+
+        <button
+          class="nav-toggle"
+          data-action="mobile-menu-toggle"
+          aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+      </div>
+    </header>
+  `;
+}
+function Footer(){
+  return `
+    <footer class="site-footer">
+      <div class="container footer-inner">
+
+        <div class="footer-col">
+          <a href="#/" class="nav-logo">
+            <img src="logo.jpeg" alt="Blockchain Club logo">
+            <span class="brand-name">Blockchain Club</span>
+          </a>
+          <p>
+            A student community exploring blockchain, cybersecurity,
+            and emerging technologies.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading mono">NAVIGATE</div>
+          <a href="#/about">About</a>
+<a href="#/events">Events</a>
+<a href="#/projects">Projects</a>
+<a href="#/team">Team</a>
+        </div>
+        
+        <div class="footer-col">
+          <div class="footer-heading mono">CONNECT</div>
+          <a href="#/contact">Contact</a>
+          <a href="#/admin/login">Admin Access</a>
+        </div>
+
+      </div>
+      
+      <div class="container footer-bottom">
+        <span>© ${new Date().getFullYear()} Blockchain Club</span>
+      </div>
+    </footer>
+  `;
+}
+function PageHead(eyebrow, title, desc){
+  return `<div class="page-head">
+    <div class="container">
+      <div class="eyebrow mono">${esc(eyebrow)}</div>
+      <h1>${esc(title)}</h1>
+      ${desc ? `<p>${esc(desc)}</p>` : ''}
+    </div>
+  </div>`;
+}
+function EmptyState({eyebrow, title, msg, ctaText, ctaHref}){
+  return `<div class="empty-state">
+    ${eyebrow ? `<div class="eyebrow mono">${esc(eyebrow)}</div>` : ''}
+    <h3>${esc(title)}</h3>
+    <p>${esc(msg)}</p>
+    ${ctaText ? `<a href="${ctaHref}" class="btn btn-outline" style="margin-top:8px;">${esc(ctaText)}</a>` : ''}
+  </div>`;
+}
+function ImgOrPlaceholder(url, alt, portrait){
+  if(url) return `<img src="${esc(url)}" alt="${esc(alt||'')}" class="cover-img ${portrait?'portrait':''}" loading="lazy">`;
+  return `<div class="img-placeholder ${portrait?'portrait':''}"></div>`;
+}
+function NotFoundPage(){
+  return `${NavBar('')}<div class="container not-found"><div class="mono eyebrow">404 / NOT FOUND</div><h1>PAGE NOT FOUND</h1>
+    <p class="text-dim" style="margin-top:16px;">The page you're looking for doesn't exist.</p>
+    <a href="#/" class="btn btn-outline" style="margin-top:28px;">Return Home</a></div>${Footer()}`;
+}
+
+async function HomePage(){
+  const hp = await homepageService.get();
+  const [events, projects, team] = await Promise.all([
+  eventService.getPublished(),
+  projectService.getAll().then(
+    l => l.filter(
+      p => (p.visibility || 'draft') === 'published'
+    )
+  ),
+  teamService.getAll()
+]);
+
+const upcomingEvents = events.slice(0,3);
+
+const featuredProjects = projects.slice(0,3);
+
+const teamPreview = [...team]
+  .sort(
+    (a,b) => (+a.order || 99) - (+b.order || 99)
+  )
+  .slice(0,4);
+
+  return `
+  ${NavBar('#/')}
+  <section class="hero" id="hero" data-section-index="00" data-section-label="Intro">
+    <canvas id="network-canvas" class="network-canvas"></canvas>
+    <div class="container hero-inner">
+      <div class="eyebrow mono">${esc(hp.heroEyebrow)}</div>
+      <h1 class="hero-title">${hp.heroTitle.split('\\n').map(l=>`<span>${esc(l)}</span>`).join('')}</h1>
+      <p class="hero-desc">${esc(hp.heroDescription)}</p>
+      <div class="hero-cta">
+        <a href="${hp.ctaPrimaryLink}" class="btn btn-primary">${esc(hp.ctaPrimary)}</a>
+        <a href="${hp.ctaSecondaryLink}" class="btn btn-outline">${esc(hp.ctaSecondary)}</a>
+      </div>
+      <div class="ascii-wrap"><canvas id="ascii-canvas" class="ascii-canvas"></canvas></div>
+    </div>
+  </section>
+
+  <section class="section" id="about" data-section-index="01" data-section-label="About">
+    <div class="container">
+      <div class="section-head">
+        <div class="big-num mono">01</div>
+        <div>
+          <h2>About</h2>
+          <p class="section-copy">A community for students who want to understand distributed systems and security as one connected discipline — not two separate tracks.</p>
+        </div>
+      </div>
+      <div class="grid grid-3">
+        <div class="wwd-item"><div class="wwd-num mono">01 /</div><h3>${esc(hp.wwd1Title)}</h3><p>${esc(hp.wwd1Desc)}</p></div>
+        <div class="wwd-item"><div class="wwd-num mono">02 /</div><h3>${esc(hp.wwd2Title)}</h3><p>${esc(hp.wwd2Desc)}</p></div>
+        <div class="wwd-item"><div class="wwd-num mono">03 /</div><h3>${esc(hp.wwd3Title)}</h3><p>${esc(hp.wwd3Desc)}</p></div>
+      </div>
+      <div style="margin-top:36px;"><a href="#/about" class="link-btn mono">MORE ABOUT THE CLUB →</a></div>
+    </div>
+  </section>
+
+  <section class="section" id="events" data-section-index="02" data-section-label="Events">
+    <div class="container">
+      <div class="section-top-row" style="margin-bottom:40px;">
+        <div class="section-head" style="margin-bottom:0;">
+          <div class="big-num mono">02</div>
+          <div><h2>Upcoming Events</h2></div>
+        </div>
+        <a href="#/events" class="link-btn mono">VIEW ALL →</a>
+      </div>
+      <div class="row-list">
+        ${upcomingEvents.length ? upcomingEvents.map((e,i)=>EventRow(e,i)).join('') : EmptyState({title:'No upcoming events', msg:'New events will appear here once published.'})}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="projects" data-section-index="03" data-section-label="Projects">
+    <div class="container">
+      <div class="section-top-row" style="margin-bottom:40px;">
+        <div class="section-head" style="margin-bottom:0;">
+          <div class="big-num mono">03</div>
+          <div><h2>Featured Projects</h2></div>
+        </div>
+        <a href="#/projects" class="link-btn mono">VIEW ALL →</a>
+      </div>
+      <div class="row-list">
+        ${featuredProjects.length ? featuredProjects.map((p,i)=>ProjectRow(p,i)).join('') : EmptyState({title:'No projects yet', msg:'Club projects will appear here once published.'})}
+      </div>
+    </div>
+  </section>
+
+
+  <section class="section" id="team" data-section-index="06" data-section-label="Team">
+    <div class="container">
+      <div class="section-top-row" style="margin-bottom:40px;">
+        <div class="section-head" style="margin-bottom:0;">
+          <div class="big-num mono">06</div>
+          <div><h2>Team</h2></div>
+        </div>
+        <a href="#/team" class="link-btn mono">MEET THE TEAM →</a>
+      </div>
+      <div class="grid grid-4">
+        ${teamPreview.map(t=>TeamCard(t)).join('')}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="contact" data-section-index="07" data-section-label="Contact">
+    <div class="container">
+      <div class="section-head">
+        <div class="big-num mono">07</div>
+        <div>
+          <h2>Get In Touch</h2>
+          <p class="section-copy">Questions about membership, projects, or partnerships — reach out any time.</p>
+        </div>
+      </div>
+      <a href="#/contact" class="btn btn-primary">Contact Us</a>
+    </div>
+  </section>
+
+  <div class="section-badge mono" id="section-badge" data-current="00">
+    <span class="num">00</span><span class="lbl">Intro</span>
+  </div>
+  ${Footer()}`;
+}
+function EventRow(e,i){
+  return `<a href="#/events" class="row-item">
+    <div class="row-index mono">${String(i+1).padStart(2,'0')}</div>
+    <div class="row-main">
+      <div class="row-type mono">${esc(e.type||'Event')}</div>
+      <h3>${esc(e.title)}</h3>
+      <div class="row-meta">${fmtDate(e.date)}${e.location?' — '+esc(e.location):''}</div>
+    </div>
+    <div class="row-arrow mono">→</div>
+  </a>`;
+}
+function ProjectRow(p,i){
+  return `<a href="#/projects" class="row-item">
+    <div class="row-index mono">${String(i+1).padStart(2,'0')}</div>
+    <div class="row-main">
+      <div class="row-type mono">${esc(p.status||'active')}</div>
+      <h3>${esc(p.title)}</h3>
+      <div class="row-meta">${esc(p.year||'')}</div>
+    </div>
+    <div class="row-arrow mono">→</div>
+  </a>`;
+}
+function CourseRow(c,i){
+  return `<a href="#/courses" class="row-item">
+    <div class="row-index mono">${String(i+1).padStart(2,'0')}</div>
+    <div class="row-main">
+      <div class="row-type mono">${esc(c.level||'Course')}</div>
+      <h3>${esc(c.title)}</h3>
+      <div class="row-meta">${esc(c.duration||'')}${c.instructor?' — '+esc(c.instructor):''}</div>
+    </div>
+    <div class="row-arrow mono">→</div>
+  </a>`;
+}
+function BlogCard(b){
+  return `<a href="#/blogs/${b.id}" class="blog-card">
+    ${ImgOrPlaceholder(b.coverImage, b.title)}
+    <div class="bc-body">
+      <div class="bc-meta mono">${esc(b.category||'Article')}</div>
+      <h3>${esc(b.title)}</h3>
+      <p>${esc(b.excerpt||'')}</p>
+      <div class="bc-foot mono">${esc(b.author||'')} — ${fmtDate(b.createdAt)}</div>
+    </div>
+  </a>`;
+}
+function TeamCard(t){
+  return `<div class="team-card">
+    ${ImgOrPlaceholder(t.image, t.name, true)}
+    <h3>${esc(t.name)}</h3>
+    <div class="role mono">${esc(t.role)}</div>
+    <div class="dept mono">${esc(t.department||'')}</div>
+  </div>`;
+}
+
+async function AboutPage(){
+  const a = await aboutService.get();
+  return `${NavBar('#/about')}
+  ${PageHead('01 / ABOUT','About the Club')}
+  <section class="section">
+    <div class="container">
+      <div class="prose">
+        <p>${esc(a.description)}</p>
+      </div>
+      <div class="grid grid-3" style="margin-top:64px;">
+        <div class="wwd-item"><div class="wwd-num mono">MISSION</div><p>${esc(a.mission)}</p></div>
+        <div class="wwd-item"><div class="wwd-num mono">VISION</div><p>${esc(a.vision)}</p></div>
+        <div class="wwd-item"><div class="wwd-num mono">FOUNDED</div><p>${esc(a.foundedYear)}</p></div>
+      </div>
+    </div>
+  </section>
+  ${Footer()}`;
+}
+
+async function EventsPage(){
+  return `${NavBar('#/events')}
+
+  ${PageHead(
+    '03 / EVENTS',
+    'Events',
+    'See upcoming Blockchain Club events and activities.'
+  )}
+
+  <section class="section calendar-section">
+    <div class="container">
+
+      <div class="calendar">
+
+        <div class="calendar-header">
+          <button
+            class="calendar-nav mono"
+            id="calendar-prev"
+            aria-label="Previous month">
+            ←
+          </button>
+
+          <div>
+            <div class="calendar-month" id="calendar-month"></div>
+            <div class="calendar-year mono" id="calendar-year"></div>
+          </div>
+
+          <button
+            class="calendar-nav mono"
+            id="calendar-next"
+            aria-label="Next month">
+            →
+          </button>
+        </div>
+
+        <div class="calendar-weekdays mono">
+          <div>MON</div>
+          <div>TUE</div>
+          <div>WED</div>
+          <div>THU</div>
+          <div>FRI</div>
+          <div>SAT</div>
+          <div>SUN</div>
+        </div>
+
+        <div
+          class="calendar-grid"
+          id="calendar-grid">
+        </div>
+        <div
+  class="calendar-details"
+  id="calendar-details">
+  <div class="eyebrow mono">SELECTED DATE</div>
+  <h3 id="selected-date">Select a date</h3>
+  <p id="selected-date-message">
+    Select a date on the calendar to see events.
+  </p>
+</div>
+
+
+    </div>
+  </section>
+
+  ${Footer()}`;
+}
+function EventRowFull(e,i){
+  return `<div class="row-item" style="cursor:default;">
+    <div class="row-index mono">${String(i+1).padStart(2,'0')}</div>
+    <div class="row-main">
+      <div class="row-type mono">${esc(e.type||'Event')}</div>
+      <h3>${esc(e.title)}</h3>
+      <p class="text-dim" style="font-size:13.5px;margin:8px 0;max-width:560px;">${esc(e.description||'')}</p>
+      <div class="row-meta">${fmtDate(e.date)} ${e.time?'— '+esc(e.time):''} ${e.location?'— '+esc(e.location):''}</div>
+    </div>
+    ${e.registrationLink ? `<a href="${esc(e.registrationLink)}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">Register</a>` : `<span class="row-arrow mono"></span>`}
+  </div>`;
+}
+
+async function ProjectsPage(){
+  const projects = (await projectService.getAll()).filter(p => (p.visibility||'draft') === 'published');
+  return `${NavBar('#/projects')}
+  ${PageHead('04 / PROJECTS','Projects','Ongoing and completed work from club members, spanning both blockchain and security tooling.')}
+  <section class="section">
+    <div class="container">
+      <div class="row-list">
+        ${projects.length ? projects.map((p,i)=>ProjectRowFull(p,i)).join('') : EmptyState({title:'No projects yet', msg:'Club projects will appear here once published.'})}
+      </div>
+    </div>
+  </section>
+  ${Footer()}`;
+}
+function ProjectRowFull(p,i){
+  const links = (p.links||'').split(',').map(s=>s.trim()).filter(Boolean).map(pair=>{
+    const [label,url] = pair.split('|').map(s=>(s||'').trim());
+    return url ? `<a href="${esc(url)}" target="_blank" rel="noopener" class="link-btn mono">${esc(label||'LINK')} ↗</a>` : '';
+  }).join(' ');
+  return `<div class="row-item" style="cursor:default;">
+    <div class="row-index mono">${String(i+1).padStart(2,'0')}</div>
+    <div class="row-main">
+      <div class="row-type mono">${esc(p.status||'active')} · ${esc(p.year||'')}</div>
+      <h3>${esc(p.title)}</h3>
+      <p class="text-dim" style="font-size:13.5px;margin:8px 0;max-width:560px;">${esc(p.description||'')}</p>
+      ${p.teamMembers ? `<div class="row-meta">${esc(p.teamMembers)}</div>` : ''}
+      ${links ? `<div style="margin-top:8px;display:flex;gap:16px;">${links}</div>` : ''}
+    </div>
+    <span class="badge ${p.status==='completed'?'published':''} mono">${esc(p.status||'')}</span>
+  </div>`;
+}
+
+async function CoursesPage(){
+  const courses = await courseService.getPublished();
+  return `${NavBar('#/courses')}
+  ${PageHead('05 / COURSES','Technical Courses','Structured, lab-driven courses taught by club leadership and faculty.')}
+  <section class="section">
+    <div class="container">
+      <div class="row-list">
+        ${courses.length ? courses.map((c,i)=>CourseRowFull(c,i)).join('') : EmptyState({title:'No courses yet', msg:'Technical courses will appear here once published.'})}
+      </div>
+    </div>
+  </section>
+  ${Footer()}`;
+}
+function CourseRowFull(c,i){
+  return `<div class="row-item" style="cursor:default;">
+    <div class="row-index mono">${String(i+1).padStart(2,'0')}</div>
+    <div class="row-main">
+      <div class="row-type mono">${esc(c.level||'')} · ${esc(c.duration||'')}</div>
+      <h3>${esc(c.title)}</h3>
+      <p class="text-dim" style="font-size:13.5px;margin:8px 0;max-width:560px;">${esc(c.description||'')}</p>
+      <div class="row-meta">${esc(c.instructor?'Instructor: '+c.instructor:'')}</div>
+    </div>
+    ${c.registrationLink ? `<a href="${esc(c.registrationLink)}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">Enroll</a>` : `<span class="row-arrow mono"></span>`}
+  </div>`;
+}
+
+async function TeamPage(){
+  const team = (await teamService.getAll()).sort((a,b)=>(+a.order||99)-(+b.order||99));
+  return `${NavBar('#/team')}
+  ${PageHead('06 / TEAM','Team','The students leading research, projects, and events for the club.')}
+  <section class="section">
+    <div class="container">
+      <div class="grid grid-4">
+        ${team.length ? team.map(t=>TeamCardFull(t)).join('') : EmptyState({title:'No team members listed', msg:'Team profiles will appear here once published.'})}
+      </div>
+    </div>
+  </section>
+  ${Footer()}`;
+}
+function TeamCardFull(t){
+  return `<div class="team-card">
+    ${ImgOrPlaceholder(t.image, t.name, true)}
+    <h3>${esc(t.name)}</h3>
+    <div class="role mono">${esc(t.role)}</div>
+    <div class="dept mono">${esc(t.department||'')}</div>
+    ${t.bio ? `<p class="bio">${esc(t.bio)}</p>` : ''}
+    <div style="margin-top:12px;display:flex;gap:14px;">
+      ${t.email ? `<a href="mailto:${esc(t.email)}" class="link-btn mono">EMAIL</a>` : ''}
+      ${t.linkedin ? `<a href="${esc(t.linkedin)}" target="_blank" rel="noopener" class="link-btn mono">LINKEDIN</a>` : ''}
+      ${t.github ? `<a href="${esc(t.github)}" target="_blank" rel="noopener" class="link-btn mono">GITHUB</a>` : ''}
+    </div>
+  </div>`;
+}
+
+async function BlogsPage(){
+  const blogs = (await blogService.getPublished()).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  return `${NavBar('#/blogs')}
+  ${PageHead('02 / BLOGS','Blog','Research notes, write-ups, and updates from club members.')}
+  <section class="section">
+    <div class="container">
+      ${blogs.length
+        ? `<div class="grid grid-3">${blogs.map(b=>BlogCard(b)).join('')}</div>`
+        : EmptyState({ title:'No entries yet', msg:'Articles from the Blockchain Club will appear here when published.' })}
+    </div>
+  </section>
+  ${Footer()}`;
+}
+async function BlogDetailPage(params){
+  const blog = await blogService.getById(params.id);
+  if(!blog || blog.status !== 'published') return NotFoundPage();
+  const contentHtml = (typeof marked !== 'undefined' && blog.content) ? marked.parse(blog.content) : `<p>${esc(blog.content||'')}</p>`;
+  return `${NavBar('#/blogs')}
+  <div class="page-head">
+    <div class="container">
+      <a href="#/blogs" class="link-btn mono">← ALL ARTICLES</a>
+      <div class="eyebrow mono" style="margin-top:22px;">${esc(blog.category||'ARTICLE')}</div>
+      <h1 style="font-size:clamp(28px,4.6vw,46px);">${esc(blog.title)}</h1>
+      <p class="mono text-dim" style="margin-top:14px;font-size:12px;">${esc(blog.author||'')} — ${fmtDate(blog.createdAt)}</p>
+    </div>
+  </div>
+  <section class="section">
+    <div class="container">
+      ${blog.coverImage ? `<img src="${esc(blog.coverImage)}" alt="${esc(blog.title)}" style="width:100%;border:1px solid var(--border);margin-bottom:48px;max-height:440px;object-fit:cover;">` : ''}
+      <div class="prose">${contentHtml}</div>
+    </div>
+  </section>
+  ${Footer()}`;
+}
+
+async function ContactPage(){
+  const c = await contactService.get();
+  return `${NavBar('#/contact')}
+  ${PageHead('07 / CONTACT','Get In Touch','Questions about membership, projects, or partnerships — reach out any time.')}
+  <section class="section">
+    <div class="container" style="display:grid;grid-template-columns:1fr 1fr;gap:64px;">
+      <div>
+        <div class="field"><label>Email</label><p style="font-size:16px;">${esc(c.email)}</p></div>
+        <div class="field"><label>Location</label><p style="font-size:16px;">${esc(c.location)}</p></div>
+        <div class="field"><label>Social</label>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:4px;">
+            ${c.twitter?`<a href="${esc(c.twitter)}" target="_blank" rel="noopener" class="link-btn mono">TWITTER</a>`:''}
+            ${c.github?`<a href="${esc(c.github)}" target="_blank" rel="noopener" class="link-btn mono">GITHUB</a>`:''}
+            ${c.linkedin?`<a href="${esc(c.linkedin)}" target="_blank" rel="noopener" class="link-btn mono">LINKEDIN</a>`:''}
+            ${c.discord?`<a href="${esc(c.discord)}" target="_blank" rel="noopener" class="link-btn mono">DISCORD</a>`:''}
+          </div>
+        </div>
+      </div>
+      <form id="contact-form">
+        <div class="field"><label>Name</label><input type="text" name="name" required placeholder="Your name"></div>
+        <div class="field"><label>Email</label><input type="email" name="email" required placeholder="you@university.edu"></div>
+        <div class="field"><label>Message</label><textarea name="message" required placeholder="How can we help?"></textarea></div>
+        <button type="submit" class="btn btn-primary">Send Message</button>
+        <p class="field-hint" style="margin-top:12px;">This form is not yet connected to a backend — submissions are not sent.</p>
+      </form>
+    </div>
+  </section>
+  ${Footer()}`;
+}
+
+function adminShell(content, activeKey){
+  const navItems = [
+    ['dashboard','Dashboard'], ['homepage','Homepage'], ['about','About'],
+    ['blogs','Blogs'], ['events','Events'], ['projects','Projects'],
+    ['courses','Courses'], ['team','Team'], ['contact','Contact']
+  ];
+  return `<div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="admin-brand mono">BCC ADMIN<small>CONTROL PANEL</small></div>
+      <nav class="admin-nav">
+        ${navItems.map(([k,label])=>`<a href="#/admin/${k}" class="${activeKey===k?'active':''}">${label}</a>`).join('')}
+        <div class="divider"></div>
+        <a href="#/">View Public Site ↗</a>
+      </nav>
+      <div class="admin-foot" id="admin-foot"></div>
+    </aside>
+    <main class="admin-main">${content}</main>
+  </div>`;
+}
+async function paintAdminFoot(){
+  const el = document.getElementById('admin-foot');
+  if(!el) return;
+  const user = await authService.currentUser();
+  el.innerHTML = `<div class="user-email">${esc(user?.email || '')}</div><button class="btn btn-outline btn-sm" data-action="logout" style="width:100%;">Log Out</button>`;
+}
+
+async function AdminLoginPage(){
+  return `<div class="login-wrap">
+    <canvas id="network-canvas" class="network-canvas" style="opacity:.25;"></canvas>
+    <div class="login-box">
+      <div class="eyebrow mono">BLOCKCHAIN CLUB</div>
+      <h1>Admin Access</h1>
+      <form id="login-form">
+        <div class="login-error mono" id="login-error"></div>
+        <div class="field"><label>Email / Username</label><input type="text" name="email" required placeholder="admin@bcc-club.edu"></div>
+        <div class="field"><label>Password</label><input type="password" name="password" required placeholder="••••••••"></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Log In</button>
+      </form>
+      <p class="login-note">Prototype authentication for frontend development only — no credentials are verified against a real backend. Any email with a password of 4+ characters will work. Do not treat this as secure.</p>
+    </div>
+  </div>`;
+}
+function bindLoginForm(){
+  const form = document.getElementById('login-form');
+  if(!form) return;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const res = await authService.login(data.get('email'), data.get('password'));
+    const errEl = document.getElementById('login-error');
+    if(res.ok){ location.hash = '#/admin/dashboard'; }
+    else { errEl.textContent = res.error; }
+  });
+}
+
+async function AdminDashboardPage(){
+  const [blogs, events, projects, courses, team] = await Promise.all([
+    blogService.getAll(), eventService.getAll(), projectService.getAll(), courseService.getAll(), teamService.getAll()
+  ]);
+  const publishedBlogs = blogs.filter(b=>b.status==='published').length;
+  const upcomingEvents = events.filter(e=>e.status==='published').length;
+  const activeProjects = projects.filter(p=>(p.visibility||'draft')==='published').length;
+  const publishedCourses = courses.filter(c=>c.status==='published').length;
+
+  const activity = [
+    ...blogs.map(i=>({...i,__type:'Blog'})), ...events.map(i=>({...i,__type:'Event'})),
+    ...projects.map(i=>({...i,__type:'Project'})), ...courses.map(i=>({...i,__type:'Course'})),
+    ...team.map(i=>({...i,__type:'Team member'}))
+  ].sort((a,b)=>(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0)).slice(0,8);
+
+  return adminShell(`
+    <div class="admin-topbar"><h1>Dashboard</h1></div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num">${publishedBlogs}</div><div class="stat-lbl mono">Published Blogs</div></div>
+      <div class="stat-card"><div class="stat-num">${upcomingEvents}</div><div class="stat-lbl mono">Upcoming Events</div></div>
+      <div class="stat-card"><div class="stat-num">${activeProjects}</div><div class="stat-lbl mono">Published Projects</div></div>
+      <div class="stat-card"><div class="stat-num">${publishedCourses}</div><div class="stat-lbl mono">Published Courses</div></div>
+      <div class="stat-card"><div class="stat-num">${team.length}</div><div class="stat-lbl mono">Team Members</div></div>
+    </div>
+    <h3 style="font-size:15px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;color:var(--text-dim);">Recent Activity</h3>
+    <div class="activity-list">
+      ${activity.length ? activity.map(i=>`<div class="activity-row">
+          <span>${esc(i.__type)} — <strong style="color:var(--text);font-weight:500;">${esc(i.title||i.name||'Untitled')}</strong></span>
+          <span class="act-time mono">${fmtDate(i.updatedAt||i.createdAt)}</span>
+        </div>`).join('')
+        : `<div class="activity-row"><span class="text-dim">No activity yet.</span></div>`}
+    </div>
+  `, 'dashboard');
+}
+
+async function AdminHomepagePage(){
+  const hp = await homepageService.get();
+  return adminShell(`
+    <div class="admin-topbar"><h1>Homepage Content</h1></div>
+    <form id="homepage-form" class="admin-form">
+      <div class="field"><label>Hero Eyebrow</label><input type="text" name="heroEyebrow" value="${esc(hp.heroEyebrow)}"></div>
+      <div class="field"><label>Hero Title (use a new line for a line break)</label><textarea name="heroTitle" rows="2">${esc(hp.heroTitle)}</textarea></div>
+      <div class="field"><label>Hero Description</label><textarea name="heroDescription">${esc(hp.heroDescription)}</textarea></div>
+      <div class="form-row-2">
+        <div class="field"><label>Primary CTA Label</label><input type="text" name="ctaPrimary" value="${esc(hp.ctaPrimary)}"></div>
+        <div class="field"><label>Primary CTA Link</label><input type="text" name="ctaPrimaryLink" value="${esc(hp.ctaPrimaryLink)}"></div>
+      </div>
+      <div class="form-row-2">
+        <div class="field"><label>Secondary CTA Label</label><input type="text" name="ctaSecondary" value="${esc(hp.ctaSecondary)}"></div>
+        <div class="field"><label>Secondary CTA Link</label><input type="text" name="ctaSecondaryLink" value="${esc(hp.ctaSecondaryLink)}"></div>
+      </div>
+      <hr class="divider" style="margin:28px 0;">
+      <div class="form-row-2">
+        <div class="field"><label>"What We Do" 1 — Title</label><input type="text" name="wwd1Title" value="${esc(hp.wwd1Title)}"></div>
+        <div class="field"><label>"What We Do" 1 — Description</label><input type="text" name="wwd1Desc" value="${esc(hp.wwd1Desc)}"></div>
+      </div>
+      <div class="form-row-2">
+        <div class="field"><label>"What We Do" 2 — Title</label><input type="text" name="wwd2Title" value="${esc(hp.wwd2Title)}"></div>
+        <div class="field"><label>"What We Do" 2 — Description</label><input type="text" name="wwd2Desc" value="${esc(hp.wwd2Desc)}"></div>
+      </div>
+      <div class="form-row-2">
+        <div class="field"><label>"What We Do" 3 — Title</label><input type="text" name="wwd3Title" value="${esc(hp.wwd3Title)}"></div>
+        <div class="field"><label>"What We Do" 3 — Description</label><input type="text" name="wwd3Desc" value="${esc(hp.wwd3Desc)}"></div>
+      </div>
+      <div class="form-actions"><button type="submit" class="btn btn-primary">Save Changes</button></div>
+    </form>
+  `, 'homepage');
+}
+function bindHomepageForm(){
+  const form = document.getElementById('homepage-form');
+  if(!form) return;
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form).entries());
+    await homepageService.update(data);
+    showToast('Homepage updated.');
+  });
+}
+async function AdminAboutPage(){
+  const a = await aboutService.get();
+  return adminShell(`
+    <div class="admin-topbar"><h1>About Page Content</h1></div>
+    <form id="about-form" class="admin-form">
+      <div class="field"><label>Club Description</label><textarea name="description" rows="6">${esc(a.description)}</textarea></div>
+      <div class="field"><label>Mission</label><textarea name="mission">${esc(a.mission)}</textarea></div>
+      <div class="field"><label>Vision</label><textarea name="vision">${esc(a.vision)}</textarea></div>
+      <div class="field"><label>Founded Year</label><input type="text" name="foundedYear" value="${esc(a.foundedYear)}"></div>
+      <div class="form-actions"><button type="submit" class="btn btn-primary">Save Changes</button></div>
+    </form>
+  `, 'about');
+}
+function bindAboutForm(){
+  const form = document.getElementById('about-form');
+  if(!form) return;
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    await aboutService.update(Object.fromEntries(new FormData(form).entries()));
+    showToast('About page updated.');
+  });
+}
+async function AdminContactPage(){
+  const c = await contactService.get();
+  return adminShell(`
+    <div class="admin-topbar"><h1>Contact Information</h1></div>
+    <form id="contact-admin-form" class="admin-form">
+      <div class="field"><label>Contact Email</label><input type="text" name="email" value="${esc(c.email)}"></div>
+      <div class="field"><label>Location</label><input type="text" name="location" value="${esc(c.location)}"></div>
+      <div class="form-row-2">
+        <div class="field"><label>Twitter / X URL</label><input type="text" name="twitter" value="${esc(c.twitter)}"></div>
+        <div class="field"><label>GitHub URL</label><input type="text" name="github" value="${esc(c.github)}"></div>
+      </div>
+      <div class="form-row-2">
+        <div class="field"><label>LinkedIn URL</label><input type="text" name="linkedin" value="${esc(c.linkedin)}"></div>
+        <div class="field"><label>Discord URL</label><input type="text" name="discord" value="${esc(c.discord)}"></div>
+      </div>
+      <div class="form-actions"><button type="submit" class="btn btn-primary">Save Changes</button></div>
+    </form>
+  `, 'contact');
+}
+function bindContactForm(){
+  const form = document.getElementById('contact-admin-form');
+  if(!form) return;
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    await contactService.update(Object.fromEntries(new FormData(form).entries()));
+    showToast('Contact information updated.');
+  });
+}
+
+async function AdminResourceListPage(resourceKey){
+  const cfg = resourceConfigs[resourceKey];
+  const items = await cfg.service.getAll();
+  const statusKey = cfg.statusField || 'status';
+  const rows = items.map(it => `<tr>
+    ${cfg.listColumns.map(([k]) => `<td>${k==='updatedAt'||k==='date' ? fmtDate(it[k]) : esc(it[k]||'—')}</td>`).join('')}
+    <td class="admin-row-actions">
+      <a href="#/admin/${resourceKey}/edit/${it.id}" class="link-btn mono">EDIT</a>
+      ${!cfg.noStatus ? `<button data-action="toggle-status" data-id="${it.id}" data-resource="${resourceKey}" class="link-btn mono">${it[statusKey]==='published'?'UNPUBLISH':'PUBLISH'}</button>` : ''}
+      <button data-action="delete" data-id="${it.id}" data-resource="${resourceKey}" class="link-btn danger mono">DELETE</button>
+    </td>
+  </tr>`).join('');
+  return adminShell(`
+    <div class="admin-topbar">
+      <h1>${cfg.label}</h1>
+      <a href="#/admin/${resourceKey}/new" class="btn btn-primary">+ New ${cfg.singular}</a>
+    </div>
+    ${items.length ? `<table class="admin-table"><thead><tr>${cfg.listColumns.map(([,l])=>`<th>${l}</th>`).join('')}<th>Actions</th></tr></thead><tbody>${rows}</tbody></table>`
+      : EmptyState({title:`No ${cfg.label.toLowerCase()} yet`, msg:`Create your first ${cfg.singular.toLowerCase()} to get started.`, ctaText:`+ NEW ${cfg.singular.toUpperCase()}`, ctaHref:`#/admin/${resourceKey}/new`})}
+  `, resourceKey);
+}
+function renderField(f, value){
+  const val = value ?? '';
+  const req = f.required ? 'required' : '';
+  if(f.type === 'textarea'){
+    return `<div class="field"><label>${esc(f.label)}${f.required?' *':''}</label><textarea name="${f.key}" ${req} placeholder="${esc(f.placeholder||'')}">${esc(val)}</textarea></div>`;
+  }
+  if(f.type === 'markdown'){
+    return `<div class="field"><label>${esc(f.label)}${f.required?' *':''}</label><textarea name="${f.key}" ${req} rows="12" class="mono-area" placeholder="${esc(f.placeholder||'')}">${esc(val)}</textarea>${f.hint?`<div class="field-hint">${esc(f.hint)}</div>`:''}</div>`;
+  }
+  if(f.type === 'select'){
+    return `<div class="field"><label>${esc(f.label)}</label><select name="${f.key}">
+      ${f.options.map(o=>`<option value="${esc(o)}" ${val===o?'selected':''}>${esc(o)}</option>`).join('')}
+    </select></div>`;
+  }
+  if(f.type === 'date'){
+    return `<div class="field"><label>${esc(f.label)}</label><input type="date" name="${f.key}" value="${esc(val)}" ${req}></div>`;
+  }
+  return `<div class="field"><label>${esc(f.label)}${f.required?' *':''}</label><input type="text" name="${f.key}" value="${esc(val)}" ${req} placeholder="${esc(f.placeholder||'')}"></div>`;
+}
+async function AdminResourceEditorPage(resourceKey, id){
+  const cfg = resourceConfigs[resourceKey];
+  const isNew = !id;
+  const item = isNew ? {} : await cfg.service.getById(id);
+  if(!isNew && !item) return `${adminShell(EmptyState({title:'Not found', msg:'This item no longer exists.', ctaText:'← BACK TO LIST', ctaHref:`#/admin/${resourceKey}`}), resourceKey)}`;
+  const statusKey = cfg.statusField || 'status';
+  const currentStatus = item[statusKey] || 'draft';
+  return adminShell(`
+    <div class="admin-topbar">
+      <h1>${isNew?'New':'Edit'} ${cfg.singular}</h1>
+      ${!isNew && !cfg.noStatus ? `<span class="badge ${currentStatus==='published'?'published':'draft'} mono">${currentStatus}</span>` : ''}
+    </div>
+    <form id="resource-form" class="admin-form">
+      ${cfg.fields.map(f => renderField(f, item[f.key])).join('')}
+      <div class="form-actions">
+        ${!cfg.noStatus ? `
+          <button type="submit" data-status="draft" class="btn btn-outline">Save Draft</button>
+          <button type="submit" data-status="published" class="btn btn-primary">Publish</button>
+        ` : `<button type="submit" data-status="" class="btn btn-primary">Save</button>`}
+        <a href="#/admin/${resourceKey}" class="link-btn mono">Cancel</a>
+      </div>
+    </form>
+  `, resourceKey);
+}
+function bindResourceEditor(resourceKey, id){
+  const form = document.getElementById('resource-form');
+  if(!form) return;
+  const cfg = resourceConfigs[resourceKey];
+  const statusKey = cfg.statusField || 'status';
+  form.querySelectorAll('button[type=submit]').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form).entries());
+      if(btn.dataset.status) data[statusKey] = btn.dataset.status;
+      if(id){ await cfg.service.update(id, data); showToast('Saved changes.'); }
+      else { await cfg.service.create(data); showToast(`${cfg.singular} created.`); }
+      location.hash = `#/admin/${resourceKey}`;
+    });
+  });
+}
+
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-action]');
+  if(!btn) return;
+  const action = btn.dataset.action;
+  if(action === 'mobile-menu-toggle'){
+    document.getElementById('site-nav')?.classList.toggle('nav-open');
+    return;
+  }
+  if(action === 'logout'){
+    await authService.logout();
+    location.hash = '#/admin/login';
+    return;
+  }
+  const resourceKey = btn.dataset.resource;
+  const id = btn.dataset.id;
+  if(action === 'delete'){
+    if(!confirm('Delete this item? This cannot be undone.')) return;
+    await resourceConfigs[resourceKey].service.delete(id);
+    showToast('Deleted.');
+    render();
+  } else if(action === 'toggle-status'){
+    const cfg = resourceConfigs[resourceKey];
+    const statusKey = cfg.statusField || 'status';
+    const item = await cfg.service.getById(id);
+    const next = item[statusKey] === 'published' ? 'draft' : 'published';
+    await cfg.service.update(id, { [statusKey]: next });
+    showToast(next === 'published' ? 'Published.' : 'Unpublished.');
+    render();
+  }
+});
+document.addEventListener('submit', (e) => {
+  if(e.target && e.target.id === 'contact-form'){
+    e.preventDefault();
+    showToast('Message received — thanks for reaching out.');
+    e.target.reset();
+  }
+});
+
+function initGlobalWidgets(path){
+  const net = document.getElementById('network-canvas');
+  if(net) initNetworkCanvas(net);
+  const ascii = document.getElementById('ascii-canvas');
+  if(ascii) initAsciiCanvas(ascii);
+  if(document.getElementById('section-badge')) initScrollSpy();
+  if(document.getElementById('admin-foot')) paintAdminFoot();
+}
+
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function initNetworkCanvas(canvas){
+  const ctx = canvas.getContext('2d');
+  let w,h,nodes,raf;
+  function resize(){
+    const rect = canvas.parentElement.getBoundingClientRect();
+    w = canvas.width = rect.width * devicePixelRatio;
+    h = canvas.height = rect.height * devicePixelRatio;
+    canvas.style.width = rect.width+'px';
+    canvas.style.height = rect.height+'px';
+  }
+  function makeNodes(){
+    const count = Math.max(24, Math.floor((w*h) / (55000 * devicePixelRatio * devicePixelRatio)));
+    nodes = Array.from({length: count}, () => ({
+      x: Math.random()*w, y: Math.random()*h,
+      vx: (Math.random()-0.5)*0.15*devicePixelRatio, vy: (Math.random()-0.5)*0.15*devicePixelRatio,
+      accent: Math.random() < 0.08
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    const maxDist = 150 * devicePixelRatio;
+    for(let i=0;i<nodes.length;i++){
+      const n = nodes[i];
+      if(!REDUCED_MOTION){ n.x += n.vx; n.y += n.vy; }
+      if(n.x < 0 || n.x > w) n.vx *= -1;
+      if(n.y < 0 || n.y > h) n.vy *= -1;
+      for(let j=i+1;j<nodes.length;j++){
+        const o = nodes[j];
+        const dx = n.x-o.x, dy = n.y-o.y;
+        const dist = Math.sqrt(dx*dx+dy*dy);
+        if(dist < maxDist){
+          ctx.strokeStyle = `rgba(140,138,130,${(1-dist/maxDist)*0.18})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(n.x,n.y); ctx.lineTo(o.x,o.y); ctx.stroke();
+        }
+      }
+    }
+    for(const n of nodes){
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.accent ? 2.4*devicePixelRatio : 1.6*devicePixelRatio, 0, Math.PI*2);
+      ctx.fillStyle = n.accent ? 'rgba(165,49,66,0.85)' : 'rgba(230,225,215,0.45)';
+      ctx.fill();
+    }
+    if(!REDUCED_MOTION) raf = requestAnimationFrame(draw);
+  }
+  resize(); makeNodes(); draw();
+  window.addEventListener('resize', () => { cancelAnimationFrame(raf); resize(); makeNodes(); draw(); }, { once:false });
+}
+function initAsciiCanvas(canvas){
+  const ctx = canvas.getContext('2d');
+  const chars = [' ','.',':','+','=','#'];
+
+  let cols, rows, cellW, cellH, grid, w, h, timer;
+
+  function resize(){
+    const rect = canvas.parentElement.getBoundingClientRect();
+
+    w = canvas.width = rect.width * devicePixelRatio;
+    h = canvas.height = rect.height * devicePixelRatio;
+
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+
+    cellW = 7 * devicePixelRatio;
+    cellH = 16 * devicePixelRatio;
+
+    cols = Math.floor(w / cellW);
+    rows = Math.floor(h / cellH);
+
+    buildGrid();
+  }
+
+  function noise(x, y, seed){
+    return Math.sin(x * 0.18 + seed) *
+           Math.cos(y * 0.22 - seed) +
+           Math.sin((x + y) * 0.09 + seed * 1.7);
+  }
+
+  function buildGrid(){
+    grid = [];
+
+    const cx1 = cols * 0.32;
+    const cy1 = rows * 0.38;
+
+    const cx2 = cols * 0.68;
+    const cy2 = rows * 0.30;
+
+    for(let y = 0; y < rows; y++){
+
+      const row = [];
+
+      for(let x = 0; x < cols; x++){
+
+        let v = noise(x, y, 1.3);
+
+        const d1 =
+          Math.hypot(
+            x - cx1,
+            (y - cy1) * 1.6
+          ) / (cols * 0.32);
+
+        const d2 =
+          Math.hypot(
+            x - cx2,
+            (y - cy2) * 1.6
+          ) / (cols * 0.28);
+
+        v +=
+          (1 - Math.min(d1, 1)) * 1.6 +
+          (1 - Math.min(d2, 1)) * 1.2;
+
+        let density = (v + 2.2) / 4.6;
+
+        if(y > rows * 0.82){
+          density =
+            0.55 + ((x + y) % 3) * 0.15;
+        }
+
+        density =
+          Math.max(0, Math.min(1, density));
+
+        const level =
+          Math.min(
+            chars.length - 1,
+            Math.floor(density * chars.length)
+          );
+
+        row.push({
+          level,
+          accent:
+            Math.random() < 0.015 &&
+            level > 1
+        });
+      }
+
+      grid.push(row);
+    }
+  }
+
+  function draw(){
+
+    ctx.clearRect(0, 0, w, h);
+
+    ctx.font =
+      `${11 * devicePixelRatio}px 'JetBrains Mono', monospace`;
+
+    ctx.textBaseline = 'top';
+
+    for(let y = 0; y < rows; y++){
+
+      for(let x = 0; x < cols; x++){
+
+        const cell = grid[y][x];
+        const ch = chars[cell.level];
+
+        if(ch === ' ') continue;
+
+        ctx.fillStyle =
+          cell.accent
+            ? 'rgba(165,49,66,0.75)'
+            : `rgba(220,215,205,${0.12 + cell.level * 0.13})`;
+
+        ctx.fillText(
+          ch,
+          x * cellW,
+          y * cellH
+        );
+      }
+    }
+  }
+
+  function flicker(){
+
+    if(REDUCED_MOTION || !grid) return;
+
+    const n =
+      Math.floor(cols * rows * 0.01);
+
+    for(let i = 0; i < n; i++){
+
+      const x =
+        Math.floor(Math.random() * cols);
+
+      const y =
+        Math.floor(Math.random() * rows);
+
+      if(grid[y] && grid[y][x]){
+
+        grid[y][x].level =
+          Math.max(
+            0,
+            Math.min(
+              chars.length - 1,
+              grid[y][x].level +
+                (Math.random() < 0.5 ? -1 : 1)
+            )
+          );
+      }
+    }
+
+    draw();
+  }
+
+  resize();
+  draw();
+
+  clearInterval(timer);
+
+  if(!REDUCED_MOTION){
+    timer = setInterval(flicker, 550);
+  }
+
+  window.addEventListener(
+    'resize',
+    () => {
+      resize();
+      draw();
+    }
+  );
+}
+
+function initScrollSpy(){
+  const badge = document.getElementById('section-badge');
+  if(!badge) return;
+  const sections = document.querySelectorAll('[data-section-index]');
+  if(!sections.length) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const idx = entry.target.dataset.sectionIndex;
+        const label = entry.target.dataset.sectionLabel;
+        if(badge.dataset.current !== idx){
+          badge.dataset.current = idx;
+          badge.classList.remove('fade'); void badge.offsetWidth; badge.classList.add('fade');
+          badge.querySelector('.num').textContent = idx;
+          badge.querySelector('.lbl').textContent = label;
+        }
+      }
+    });
+  }, { threshold: 0.45 });
+  sections.forEach(s => io.observe(s));
+}
+</script>
+</body>
+</html>
