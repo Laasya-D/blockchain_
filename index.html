@@ -41,7 +41,7 @@
   margin-top:10px;
   background:var(--accent);
   border-radius:50%;
-}
+}co
 /* tokens*/
 .calendar-details{
   padding:26px 30px;
@@ -396,6 +396,65 @@ img{max-width:100%;display:block;}
 
 .page-fade{animation:pageIn .45s ease both;}
 @keyframes pageIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+/* ============================= PAGE TRANSITION ============================= */
+
+#page-transition{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  pointer-events:none;
+  opacity:0;
+  background:#070707;
+}
+
+#page-transition::after{
+  content:'';
+  position:absolute;
+  top:50%;
+  left:0;
+  width:100%;
+  height:1px;
+  background:var(--accent-bright);
+  box-shadow:0 0 18px rgba(208,43,68,.55);
+  transform:scaleX(0);
+  transform-origin:left;
+}
+
+#page-transition.active{
+  opacity:1;
+  animation:transitionFade .42s ease both;
+}
+
+#page-transition.active::after{
+  animation:scanLine .42s cubic-bezier(.77,0,.18,1) both;
+}
+
+@keyframes transitionFade{
+  0%{
+    opacity:0;
+  }
+  20%{
+    opacity:1;
+  }
+  75%{
+    opacity:1;
+  }
+  100%{
+    opacity:0;
+  }
+}
+
+@keyframes scanLine{
+  0%{
+    transform:scaleX(0);
+  }
+  45%{
+    transform:scaleX(1);
+  }
+  100%{
+    transform:scaleX(1);
+  }
+}
 .page-loading{padding:200px 0;text-align:center;color:var(--text-faint);font-size:11px;letter-spacing:.2em;}
 .not-found{padding:220px 0;text-align:center;}
 .not-found h1{font-size:80px;color:var(--text-faint);}
@@ -565,6 +624,9 @@ img{max-width:100%;display:block;}
 </head>
 <body>
 <div id="app"></div>
+
+<div id="page-transition"></div>
+
 <div id="toast-root"></div>
 
 <script>
@@ -1030,7 +1092,34 @@ cell.innerHTML = `
 
   renderCalendar();
 }
+let firstPageLoad = true;
+
+function startPageTransition(){
+  if(firstPageLoad) return;
+
+  const transition = document.getElementById('page-transition');
+
+  if(transition){
+    transition.classList.remove('active');
+
+    // Force animation restart
+    void transition.offsetWidth;
+
+    transition.classList.add('active');
+  }
+}
+
+function endPageTransition(){
+  const transition = document.getElementById('page-transition');
+
+  if(transition){
+    setTimeout(() => {
+      transition.classList.remove('active');
+    }, 420);
+  }
+}
 async function render(){
+  startPageTransition();
   const path = parseHash();
   const found = matchRoute(path);
   const app = document.getElementById('app');
@@ -1045,9 +1134,20 @@ async function render(){
   try{ html = await route.view(params); }
   catch(e){ console.error(e); html = NotFoundPage(); }
   app.innerHTML = `<div class="page-fade">${html}</div>`;
-  window.scrollTo(0,0);
-  if(route.after) route.after(params);
-  initGlobalWidgets(path);
+
+window.scrollTo(0,0);
+
+if(route.after) route.after(params);
+
+initGlobalWidgets(path);
+
+if(path === '/events'){
+  initCalendar();
+}
+
+endPageTransition();
+
+firstPageLoad = false;
   if(path === '/events'){
   initCalendar();
 }
